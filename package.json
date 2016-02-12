@@ -8,7 +8,7 @@
     "url": "git://github.com/hungryinc/hgResource.git"
   },
   "keywords": [
-    "AngularJs",
+    "AngularJs"
   ],
   "author": "Zachary Blank <zach@hungryinc.com> (http://hungryinc.com/)",
   "dependencies": {
