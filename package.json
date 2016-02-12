@@ -1,0 +1,17 @@
+{
+  "name": "hgResource",
+  "version": "0.1.0",
+  "description": "A layer ontop of Angular ngResource",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hungryinc/hgResource.git"
+  },
+  "keywords": [
+    "AngularJs",
+  ],
+  "author": "Zachary Blank <zach@hungryinc.com> (http://hungryinc.com/)",
+  "dependencies": {
+    "angular-resource": "~1.3.2",
+  }
+}
