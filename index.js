@@ -94,6 +94,8 @@ angular.module('hgResource', [
                 };
 
                 angular.forEach(actions, function(action, key) {
+                    
+                    // action.cancellable = true;
 
                     if (resourceObject) {
                         var responseTransformer = new ResponseTransformer;
