@@ -39,7 +39,7 @@ angular.module('hgResource', [
 
                 return response.data;
             } else {
-                return false;
+                return angular.fromJson(response);
             }
         }
 
