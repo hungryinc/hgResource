@@ -4,6 +4,8 @@ angular.module('hgResource', [
     'ngResource'
 ])
 
+.config(require('./intercepter'))
+
 .provider('Resource', function($resourceProvider) {
 
     var defaults = $resourceProvider.defaults;
@@ -22,7 +24,6 @@ angular.module('hgResource', [
         var prototype;
 
         var transformer = function(response, headersGetter, status) {
-
             if (status == 200 || status == 201) {
                 response = angular.fromJson(response);
 
@@ -72,7 +73,7 @@ angular.module('hgResource', [
                 var resourceKey = Object.keys(resource)[0];
 
                 if (angular.isArray(resource[resourceKey])) {
-                    var resourceObject = resource[resourceKey][resource[resourceKey].length -1];
+                    var resourceObject = resource[resourceKey][resource[resourceKey].length - 1];
                     var dependancies = resource[resourceKey].slice(0, -1);
                 } else {
                     var resourceObject = resource[resourceKey];
@@ -85,7 +86,7 @@ angular.module('hgResource', [
 
                 for (var i = 0; i < dependancies.length; i++) {
                     if (typeof dependancies[i] == 'string') {
-                        if ( ! globals.hasOwnProperty(dependancies[i])) {
+                        if (!globals.hasOwnProperty(dependancies[i])) {
                             globals[dependancies[i]] = $injector.get(dependancies[i]);
                         }
 
@@ -94,7 +95,7 @@ angular.module('hgResource', [
                 };
 
                 angular.forEach(actions, function(action, key) {
-                    
+
                     // action.cancellable = true;
 
                     if (resourceObject) {
@@ -106,11 +107,7 @@ angular.module('hgResource', [
                             key: resourceKey
                         });
 
-                        if (resourceObject.prototype.transform && (action.method == 'POST' || action.method == 'PUT')) {
-                            action.transformRequest = resourceObject.prototype.transform;
-                        }
-
-                        if ( ! action.interceptor) {
+                        if (!action.interceptor) {
                             action.interceptor = {}
                         }
 
@@ -134,7 +131,7 @@ angular.module('hgResource', [
                     actions[key] = angular.extend({}, action, config);
                 })
 
-                if ( ! domainPattern.test(endpoint)) {
+                if (!domainPattern.test(endpoint)) {
                     endpoint = (defaults.url || '') + endpoint;
                 }
 
