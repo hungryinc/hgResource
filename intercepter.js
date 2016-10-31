@@ -1,6 +1,4 @@
 module.exports = function($httpProvider) {
-	console.log("ghfjsklgf");
-
     var interceptor = ['$q',
         function($q) {
             return {

@@ -40,7 +40,11 @@ angular.module('hgResource', [
 
                 return response.data;
             } else {
-                return angular.fromJson(response);
+                try {
+                    return angular.fromJson(response);
+                } catch (e) {
+                    return response;
+                }
             }
         }
 
