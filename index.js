@@ -141,23 +141,25 @@ angular.module('hgResource', [
 
                 var Resource = $resource(endpoint, paramDefaults, angular.copy(actions));
 
-                angular.forEach(dependancies, function(value, key) {
-                    if (value == null) {
-                        dependancies[key] = Resource;
-                    }
-                })
-
                 var constructor = function(data) {
                     angular.extend(Resource.prototype, resourceObject.prototype);
 
                     return (data) ? angular.extend(new Resource(), resourceObject.apply(data, dependancies)) : resource;
                 }
 
+                angular.extend(constructor, Resource);
+
                 if (resourceObject) {
-                    globals[resourceKey] = angular.extend(constructor, Resource);
+                    globals[resourceKey] = constructor;
                 }
 
-                return angular.extend(constructor, Resource);
+                    angular.forEach(dependancies, function(value, key) {
+                        if (value == null) {
+                            dependancies[key] = constructor;                            
+                        }
+                    })
+
+                return constructor;
             }
 
             service.apiUrl = defaults.url;
