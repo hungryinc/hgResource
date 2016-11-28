@@ -153,11 +153,11 @@ angular.module('hgResource', [
                     globals[resourceKey] = constructor;
                 }
 
-                    angular.forEach(dependancies, function(value, key) {
-                        if (value == null) {
-                            dependancies[key] = constructor;                            
-                        }
-                    })
+                angular.forEach(dependancies, function(value, key) {
+                    if (value == null) {
+                        dependancies[key] = constructor;                            
+                    }
+                })
 
                 return constructor;
             }
