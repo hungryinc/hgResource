@@ -24,6 +24,12 @@ angular.module('hgResource', [
         var prototype;
 
         var transformer = function(response, headersGetter, status) {
+            var $injector = this.$injector;
+
+            var dependancies = this.dependancies.map(function(dependancy) {
+                return $injector.get(dependancy);
+            })
+
             if (status == 200 || status == 201) {
                 response = angular.fromJson(response);
 
@@ -32,10 +38,10 @@ angular.module('hgResource', [
 
                 if (angular.isArray(response.data)) {
                     for (var i = response.data.length - 1; i >= 0; i--) {
-                        response.data[i] = this.object.apply(response.data[i], this.dependancies);
+                        response.data[i] = this.object.apply(response.data[i], dependancies);
                     }
                 } else {
-                    response.data = this.object.apply(response.data, this.dependancies);
+                    response.data = this.object.apply(response.data, dependancies);
                 }
 
                 return response.data;
@@ -84,23 +90,7 @@ angular.module('hgResource', [
                     var dependancies = [];
                 }
 
-                if (resourceObject) {
-                    globals[resourceKey] = null;
-                }
-
-                for (var i = 0; i < dependancies.length; i++) {
-                    if (typeof dependancies[i] == 'string') {
-                        if (!globals.hasOwnProperty(dependancies[i])) {
-                            globals[dependancies[i]] = $injector.get(dependancies[i]);
-                        }
-
-                        dependancies[i] = globals[dependancies[i]];
-                    }
-                };
-
                 angular.forEach(actions, function(action, key) {
-
-                    // action.cancellable = true;
 
                     if (resourceObject) {
                         var responseTransformer = new ResponseTransformer;
@@ -108,7 +98,8 @@ angular.module('hgResource', [
                         action.transformResponse = responseTransformer.bind({
                             object: resourceObject,
                             dependancies: dependancies,
-                            key: resourceKey
+                            key: resourceKey,
+                            $injector: $injector,
                         });
 
                         if (!action.interceptor) {
@@ -144,22 +135,18 @@ angular.module('hgResource', [
                 var constructor = function(data) {
                     angular.extend(Resource.prototype, resourceObject.prototype);
 
-                    return (data) ? angular.extend(new Resource(), resourceObject.apply(data, dependancies)) : resource;
-                }
+                    deps = dependancies.map(function(dependancy) {
+                        return $injector.get(dependancy);
+                    });
 
-                angular.extend(constructor, Resource);
+                    return (data) ? angular.extend(new Resource(), resourceObject.apply(data, deps)) : resource;
+                }
 
                 if (resourceObject) {
-                    globals[resourceKey] = constructor;
+                    globals[resourceKey] = angular.extend(constructor, Resource);
                 }
 
-                angular.forEach(dependancies, function(value, key) {
-                    if (value == null) {
-                        dependancies[key] = constructor;                            
-                    }
-                })
-
-                return constructor;
+                return angular.extend(constructor, Resource);
             }
 
             service.apiUrl = defaults.url;
