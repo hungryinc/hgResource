@@ -10,8 +10,6 @@ angular.module('hgResource', [
 
     var defaults = $resourceProvider.defaults;
 
-    var globals = {};
-
     // Add $update method to all resources
     defaults.actions.update = {
         method: 'PUT',
@@ -26,22 +24,19 @@ angular.module('hgResource', [
         var transformer = function(response, headersGetter, status) {
             var $injector = this.$injector;
 
-            var dependancies = this.dependancies.map(function(dependancy) {
-                return $injector.get(dependancy);
-            })
-
             if (status == 200 || status == 201) {
                 response = angular.fromJson(response);
 
                 total = response.total;
-                prototype = this.object.prototype;
+                prototype = this.factory.prototype;
 
                 if (angular.isArray(response.data)) {
                     for (var i = response.data.length - 1; i >= 0; i--) {
-                        response.data[i] = this.object.apply(response.data[i], dependancies);
+
+                        response.data[i] = $injector.invoke(this.factory, response.data[i]);
                     }
                 } else {
-                    response.data = this.object.apply(response.data, dependancies);
+                    response.data = $injector.invoke(this.factory, response.data);
                 }
 
                 return response.data;
@@ -77,28 +72,16 @@ angular.module('hgResource', [
 
         $get: function($resource, $injector) {
 
-            var service = function(endpoint, paramDefaults, resource, actions, config) {
+            var service = function(endpoint, paramDefaults, factory, actions, config) {
                 actions = angular.extend({}, defaults.actions, actions);
-
-                var resourceKey = Object.keys(resource)[0];
-
-                if (angular.isArray(resource[resourceKey])) {
-                    var resourceObject = resource[resourceKey][resource[resourceKey].length - 1];
-                    var dependancies = resource[resourceKey].slice(0, -1);
-                } else {
-                    var resourceObject = resource[resourceKey];
-                    var dependancies = [];
-                }
 
                 angular.forEach(actions, function(action, key) {
 
-                    if (resourceObject) {
+                    if (factory) {
                         var responseTransformer = new ResponseTransformer;
 
                         action.transformResponse = responseTransformer.bind({
-                            object: resourceObject,
-                            dependancies: dependancies,
-                            key: resourceKey,
+                            factory: factory,
                             $injector: $injector,
                         });
 
@@ -133,17 +116,9 @@ angular.module('hgResource', [
                 var Resource = $resource(endpoint, paramDefaults, angular.copy(actions));
 
                 var constructor = function(data) {
-                    angular.extend(Resource.prototype, resourceObject.prototype);
+                    angular.extend(Resource.prototype, factory.prototype);
 
-                    deps = dependancies.map(function(dependancy) {
-                        return $injector.get(dependancy);
-                    });
-
-                    return (data) ? angular.extend(new Resource(), resourceObject.apply(data, deps)) : resource;
-                }
-
-                if (resourceObject) {
-                    globals[resourceKey] = angular.extend(constructor, Resource);
+                    return (data) ? angular.extend(new Resource(), $injector.invoke(factory, data)) : factory;
                 }
 
                 return angular.extend(constructor, Resource);
