@@ -118,7 +118,7 @@ angular.module('hgResource', [
                 var constructor = function(data) {
                     angular.extend(Resource.prototype, factory.prototype);
 
-                    return (data) ? angular.extend(new Resource(), $injector.invoke(factory, data)) : factory;
+                    return (data) ? angular.extend(new Resource(), $injector.invoke(factory, data)) : new Resource();
                 }
 
                 return angular.extend(constructor, Resource);
