@@ -32,11 +32,10 @@ angular.module('hgResource', [
 
                 if (angular.isArray(response.data)) {
                     for (var i = response.data.length - 1; i >= 0; i--) {
-
-                        response.data[i] = $injector.invoke(this.factory, response.data[i]);
+                        $injector.invoke(this.factory, response.data[i]);
                     }
                 } else {
-                    response.data = $injector.invoke(this.factory, response.data);
+                    $injector.invoke(this.factory, response.data);
                 }
 
                 return response.data;

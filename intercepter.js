@@ -1,19 +1,25 @@
 module.exports = function($httpProvider) {
-    var interceptor = ['$q',
-        function($q) {
-            return {
-                'request': function(config) {
-                    if (config.method == 'POST' || config.method == 'PUT') {
-                    	if (config.data && config.data.__proto__.transform) {
-		                    return config.data.__proto__.transform(config);
-		                }
-                    }
+    $httpProvider.interceptors.push(function($q, $injector) {
+        return {
+            'request': function(config) {
+                if (config.method == 'POST' || config.method == 'PUT') {
+                    if (config.data && config.data.__proto__.transform) {
+                        var deferred = $q.defer();
+            
+                        config.data = angular.copy(config.data);
 
-                	return config;
+                        $q.when($injector.invoke(config.data.__proto__.transform, config), function() {
+                            deferred.resolve(config);
+                        }, function() {
+                             deferred.reject();
+                        });
+
+                        return deferred.promise;
+                    }
                 }
+
+                return config;
             }
         }
-	];
-
-    $httpProvider.interceptors.push(interceptor);
+    });
 }
