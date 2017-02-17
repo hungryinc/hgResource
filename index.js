@@ -7,7 +7,6 @@ angular.module('hgResource', [
 .config(require('./intercepter'))
 
 .provider('Resource', function($resourceProvider) {
-
     var defaults = $resourceProvider.defaults;
 
     // Add $update method to all resources
@@ -84,7 +83,7 @@ angular.module('hgResource', [
                             $injector: $injector,
                         });
 
-                        if (!action.interceptor) {
+                        if ( ! action.interceptor) {
                             action.interceptor = {}
                         }
 
@@ -117,7 +116,9 @@ angular.module('hgResource', [
                 var constructor = function(data) {
                     angular.extend(Resource.prototype, factory.prototype);
 
-                    return (data) ? angular.extend(new Resource(), $injector.invoke(factory, data)) : new Resource();
+                    var resource = angular.extend(new Resource(), $injector.invoke(factory, data));
+
+                    return (data) ? resource : new Resource();
                 }
 
                 return angular.extend(constructor, Resource);
