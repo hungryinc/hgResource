@@ -24,8 +24,8 @@ module.exports = function($httpProvider) {
 
                             $q.when($injector.invoke(config.data.__proto__.transform, config), function() {
                                 deferred.resolve(config);
-                            }, function() {
-                                 deferred.reject();
+                            }, function(response) {
+                                deferred.reject(response);
                             });
 
                             return deferred.promise;
