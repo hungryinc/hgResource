@@ -22,7 +22,8 @@ module.exports = function($httpProvider) {
                 
                             config.data = angular.copy(config.data);
 
-                            $q.when($injector.invoke(config.data.__proto__.transform, config), function() {
+                            $q.when($injector.invoke(config.data.__proto__.transform, config.data), function() {
+                                console.log(config)
                                 deferred.resolve(config);
                             }, function(response) {
                                 deferred.reject(response);

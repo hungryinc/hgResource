@@ -17,7 +17,7 @@ angular.module('hgResource', [
     var domainPattern = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/
 
     var ResponseTransformer = function() {
-        var total = null;
+        var meta = null;
         var prototype;
 
         var transformer = function(response, headersGetter, status) {
@@ -26,7 +26,9 @@ angular.module('hgResource', [
             if (status == 200 || status == 201) {
                 response = angular.fromJson(response);
 
-                total = response.total;
+                meta = angular.copy(response);
+                delete meta.data;
+
                 prototype = this.factory.prototype;
 
                 if (angular.isArray(response.data)) {
@@ -47,8 +49,8 @@ angular.module('hgResource', [
             }
         }
 
-        transformer.getTotal = function() {
-            return total;
+        transformer.getMeta = function() {
+            return meta;
         }
 
         transformer.getPrototype = function() {
@@ -95,7 +97,7 @@ angular.module('hgResource', [
                                     response.data[i] = new Resource(value);
                                 });
 
-                                response.data.total = responseTransformer.getTotal();
+                                angular.extend(response.data, responseTransformer.getMeta());
                             } else {
                                 response.data = new Resource(response.data);
                             }
