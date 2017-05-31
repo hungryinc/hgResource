@@ -5,32 +5,40 @@ module.exports = function($httpProvider) {
                 if (config.method == 'POST' || config.method == 'PUT') {
 
                     if (config.data) {
+                        var deferred = $q.defer(),
+                            promises = [];
 
                         // TODO: Allow for a promise response
                         for (var prop in config.data) {
                             if (angular.isArray(config.data[prop])) {
                                 for (var i = 0; i < config.data[prop].length; i++) {
                                     if (config.data[prop][i].__proto__.transform) {
-                                        config.data[prop][i] = $injector.invoke(config.data[prop][i].__proto__.transform, config.data[prop][i]);
+                                        (function(data) {
+                                            var promise = $q.when($injector.invoke(data.__proto__.transform, data));
+
+                                            promises.push(promise);
+                                        })(config.data[prop][i]);
                                     }
                                 }
                             }
                         }
 
                         if (config.data.__proto__.transform) {
-                            var deferred = $q.defer();
                 
                             config.data = angular.copy(config.data);
 
-                            $q.when($injector.invoke(config.data.__proto__.transform, config.data), function() {
-                                console.log(config)
-                                deferred.resolve(config);
-                            }, function(response) {
-                                deferred.reject(response);
-                            });
+                            var promise = $q.when($injector.invoke(config.data.__proto__.transform, config.data)).$promise;
 
-                            return deferred.promise;
+                            if (promise) {
+                                promises.push(promise);
+                            }
                         }
+
+                        $q.all(promises).then(function() {
+                            deferred.resolve(config);
+                        })
+
+                        return deferred.promise;
                     }
                 }
 
