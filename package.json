@@ -1,6 +1,6 @@
 {
   "name": "hungry-resource",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A layer ontop of Angular ngResource",
   "main": "index.js",
   "repository": {

@@ -14,12 +14,14 @@ module.exports = function($httpProvider) {
                                 for (var i = 0; i < config.data[prop].length; i++) {
                                     if (config.data[prop][i].__proto__.transform) {
                                         (function(data) {
-                                            var promise = $q.when($injector.invoke(data.__proto__.transform, data));
-
-                                            promises.push(promise);
+                                            promises.push($q.when($injector.invoke(data.__proto__.transform, data)));
                                         })(config.data[prop][i]);
                                     }
                                 }
+                            } else if (config.data[prop] && config.data[prop].__proto__ && config.data[prop].__proto__.transform) {
+                                (function(data) {
+                                    promises.push($q.when($injector.invoke(data.__proto__.transform, data)));
+                                })(config.data[prop]);
                             }
                         }
 
