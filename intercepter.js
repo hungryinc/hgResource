@@ -19,11 +19,10 @@ module.exports = function($httpProvider) {
                                     }
                                 }
                             } else if (config.data[prop] && config.data[prop].__proto__ && config.data[prop].__proto__.transform) {
-                                (function(data) {
-                                    promises.push($q.when($injector.invoke(data.__proto__.transform, data)));
-                                })(config.data[prop]);
+                                promises.push($q.when($injector.invoke(config.data[prop].__proto__.transform, config.data[prop])));
                             }
                         }
+
 
                         if (config.data.__proto__.transform) {
                 
