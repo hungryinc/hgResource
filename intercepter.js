@@ -29,7 +29,7 @@ module.exports = function($httpProvider) {
                 
                             config.data = angular.copy(config.data);
 
-                            var promise = $q.when($injector.invoke(config.data.__proto__.transform, config.data)).$promise;
+                            var promise = $q.when($injector.invoke(config.data.__proto__.transform, config.data));
 
                             if (promise) {
                                 promises.push(promise);
