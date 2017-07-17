@@ -37,6 +37,8 @@ module.exports = function($httpProvider) {
 
                         $q.all(promises).then(function() {
                             deferred.resolve(config);
+                        }, function(error) {
+                            deferred.reject(error);
                         })
 
                         return deferred.promise;
